@@ -1,74 +1,61 @@
 package com.gevernova.employeerollapp.service;
 
+import com.gevernova.employeerollapp.dto.EmployeeDTO;
 import com.gevernova.employeerollapp.entity.Employee;
+import com.gevernova.employeerollapp.exception.EmployeeNotFoundException;
 import com.gevernova.employeerollapp.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
-//@Service
-//public class EmployeeService {
-//
-//    @Autowired
-//    private EmployeeRepository repo;
-//
-//    public List<Employee> getAll() {
-//        return repo.findAll();
-//    }
-//
-//    public Employee getById(int id) {
-//        return repo.findById(id).orElse(null);
-//    }
-//
-//    public Employee create(Employee emp) {
-//        return repo.save(emp);
-//    }
-//
-//    public Employee update(Employee emp) {
-//        return repo.save(emp);
-//    }
-//
-//    public void delete(int id) {
-//        repo.deleteById(id);
-//    }
-//}
 @Service
-public class EmployeeService {
-    private final List<Employee> employeeList = new ArrayList<>();
-    private int currentId = 1;
+public class EmployeeService implements IEmployeeService {
 
+    @Autowired
+    private EmployeeRepository repository;
+
+    @Override
     public List<Employee> getAllEmployees() {
-        return employeeList;
+        return repository.findAll();
     }
 
+    @Override
     public Employee getEmployeeById(int id) {
-        return employeeList.stream()
-                .filter(emp -> emp.getId() == id)
-                .findFirst()
-                .orElse(null);
+        return repository.findById(id)
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with ID: " + id));
     }
 
+    @Override
     public Employee createEmployee(Employee emp) {
-        emp.setId(currentId++);
-        employeeList.add(emp);
-        return emp;
+        return repository.save(emp);
     }
 
+    @Override
+    public Employee createEmployee(EmployeeDTO dto) {
+        Employee employee = Employee.builder()
+                .name(dto.getName())
+                .salary(dto.getSalary())
+                .departments(dto.getDepartments())
+                .build();
+        return repository.save(employee);
+    }
+
+    @Override
     public Employee updateEmployee(int id, Employee updatedEmp) {
-        for (int i = 0; i < employeeList.size(); i++) {
-            if (employeeList.get(i).getId() == id) {
-                updatedEmp.setId(id);
-                employeeList.set(i, updatedEmp);
-                return updatedEmp;
-            }
+        if (!repository.existsById(id)) {
+            throw new EmployeeNotFoundException("Cannot update. Employee not found with ID: " + id);
         }
-        return null;
+        updatedEmp.setId(id);
+        return repository.save(updatedEmp);
     }
 
+    @Override
     public boolean deleteEmployee(int id) {
-        return employeeList.removeIf(emp -> emp.getId() == id);
+        if (!repository.existsById(id)) {
+            throw new EmployeeNotFoundException("Cannot delete. Employee not found with ID: " + id);
+        }
+        repository.deleteById(id);
+        return true;
     }
 }
-
