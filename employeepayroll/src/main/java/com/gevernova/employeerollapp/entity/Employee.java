@@ -28,8 +28,12 @@ public class Employee {
 
     private long salary;
 
+    @Column(nullable = false, unique = true)
+    private String email;
+
     @ElementCollection
     @Column(name = "department")
     private List<String> departments;
 }
+
 
