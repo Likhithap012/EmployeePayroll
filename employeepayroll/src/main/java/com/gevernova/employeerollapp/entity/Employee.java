@@ -28,7 +28,7 @@ public class Employee {
 
     private long salary;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     @ElementCollection

@@ -8,11 +8,10 @@ import jakarta.mail.MessagingException;
 import java.util.List;
 
 public interface IEmployeeService {
-    List<Employee> getAllEmployees();
-    Employee getEmployeeById(int id);
-    Employee createEmployee(Employee emp);
+    List<EmployeeDTO> getAllEmployees();
+    EmployeeDTO getEmployeeById(int id);
     EmployeeDTO create(EmployeeDTO employeeDTO) throws MessagingException;
 
-    Employee updateEmployee(int id, Employee updatedEmp);
-    boolean deleteEmployee(int id);
+    EmployeeDTO updateEmployee(int id, EmployeeDTO updatedEmp);
+    Void deleteEmployee(int id);
 }

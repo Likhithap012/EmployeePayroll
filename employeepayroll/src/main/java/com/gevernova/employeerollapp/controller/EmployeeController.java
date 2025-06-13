@@ -1,58 +1,56 @@
 package com.gevernova.employeerollapp.controller;
 
 import com.gevernova.employeerollapp.dto.EmployeeDTO;
-import com.gevernova.employeerollapp.entity.Employee;
 import com.gevernova.employeerollapp.mapper.EmployeeMapper;
 import com.gevernova.employeerollapp.service.EmployeeService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/employeepayrollservice")
+@RequiredArgsConstructor
 public class EmployeeController {
 
-    @Autowired
-    private EmployeeService service;
+    private final EmployeeService service;
 
-    @Autowired
-    private EmployeeMapper mapper;
+    private final EmployeeMapper mapper;
 
+    //http://localhost:8080/employeepayrollservice/
     @GetMapping("/")
     public ResponseEntity<List<EmployeeDTO>> getAll() {
-        List<EmployeeDTO> list = service.getAllEmployees()
-                .stream().map(mapper::toDTO)
-                .collect(Collectors.toList());
+        List<EmployeeDTO> list = service.getAllEmployees();
         return ResponseEntity.ok(list);
     }
-
+    //http://localhost:8080/employeepayrollservic/get/1
     @GetMapping("/get/{id}")
     public ResponseEntity<EmployeeDTO> getById(@PathVariable int id) {
-        Employee emp = service.getEmployeeById(id);
-        return ResponseEntity.ok(mapper.toDTO(emp));
+        EmployeeDTO emp = service.getEmployeeById(id);
+        return ResponseEntity.ok(emp);
     }
-
+    //http://localhost:8080/employeepayrollservice/create
     @PostMapping("/create")
     public ResponseEntity<EmployeeDTO> create(@Valid @RequestBody EmployeeDTO dto) throws MessagingException {
         EmployeeDTO saved = service.create(dto);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 
-
+//    http://localhost:8080/employeepayrollservice/update/1
     @PutMapping("/update/{id}")
     public ResponseEntity<EmployeeDTO> update(@PathVariable int id, @Valid @RequestBody EmployeeDTO dto) {
-        Employee updated = service.updateEmployee(id, mapper.toEntity(dto));
-        return ResponseEntity.ok(mapper.toDTO(updated));
+        EmployeeDTO updated = service.updateEmployee(id, dto);
+        return ResponseEntity.ok(updated);
     }
 
+//    http://localhost:8080/employeepayrollservice/delete/1
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable int id) {
-        boolean deleted = service.deleteEmployee(id);
-        return ResponseEntity.ok(deleted ? "Deleted" : "Not Found");
+        service.deleteEmployee(id);
+        return ResponseEntity.ok("Employee with ID " + id + " has been deleted successfully.");
     }
+
 }
