@@ -20,7 +20,6 @@ public class EmployeeController {
 
     private final EmployeeMapper mapper;
 
-    //http://localhost:8080/employeepayrollservice/
     @GetMapping("/")
     public ResponseEntity<List<EmployeeDTO>> getAll() {
         List<EmployeeDTO> list = service.getAllEmployees();
